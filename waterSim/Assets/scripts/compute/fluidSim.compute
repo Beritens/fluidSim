@@ -1,0 +1,472 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+#pragma kernel moveStuff
+#pragma kernel wipe
+#include "/includes/elementBehaviour.compute"
+
+
+//TODO: create struct for elements, movable, velocity and particle
+
+RWTexture2D<float4> Result;
+
+struct pixel{
+        
+        uint element;
+        uint movable;
+        float2 velocity;
+        uint particle;
+        float2 subPixPos;
+        //int particleTimer;
+};
+RWStructuredBuffer<pixel> pixelBuffer;
+RWStructuredBuffer<uint> testArea;
+Texture2D<float4> colors;
+uint testAreaSize;
+bool rerun;
+uint TexSizeX;
+uint TexSizeY;
+uint pixelsPerUnit;
+float dt;
+
+void resetPixel(int index){
+    pixelBuffer[index].element = 0;
+    pixelBuffer[index].movable = 0;
+    pixelBuffer[index]. velocity = float2(0,0);
+    //pixelBuffer[index].particleTimer = 0;
+}
+float2 rotateVector(float2 v, float degrees){
+    float s = sin(degrees * 0.0174533);
+    float c = cos(degrees * 0.0174533);
+
+    float tx = v.x;
+    float ty = v.y;
+    return float2((c * tx) - (s * ty),(s *tx) + (c * ty));
+}
+
+uint flow_(int element, int i, int xyz){
+    return flow[element-1][i][xyz];
+}
+uint fluid_(int element){
+    return fluid[element-1];
+}
+uint indexFromCo(int2 co){
+    return co.y*TexSizeX +co.x;
+}
+uint eleFromCo(int2 co){
+    return pixelBuffer[indexFromCo(co)].element;
+
+}
+// void calcParticleTimer(uint2 id){
+//     uint index = indexFromCo(id);
+//     float vel = length(pixelBuffer[index].velocity);
+//     if(vel*dt*pixelsPerUnit >1){
+        
+//         //pixelBuffer[index].particleTimer = 0;
+//         return;
+//     }
+    
+//     pixelBuffer[index].particleTimer =  1/(vel*dt*pixelsPerUnit);
+    
+// }
+
+uint2 particleTest(uint2 id, float2 vel, int element){
+    float2 velo = float2(vel.x*dt*pixelsPerUnit,vel.y*dt*pixelsPerUnit);
+    int index = indexFromCo(id);
+    int v = (int)length(velo);
+    float2 norm = float2(velo.x/length(velo),velo.y/length(velo));
+    
+    // if(v==0){
+    //     pixelBuffer[index].particleTimer --;
+        
+    //     if(pixelBuffer[index].particleTimer <= 0){
+            
+    //         velo = norm;
+    //     }
+    // }
+    // else{
+    //     pixelBuffer[index].particleTimer = 0;
+    // }
+    
+    
+    uint2 target = id.xy;
+    float2 targetf = float2(id.x+pixelBuffer[index].subPixPos.x  ,  id.y+pixelBuffer[index].subPixPos.y);
+    uint halfSize = (testAreaSize-1)/2;
+    for(int i = 1; i<v+1; i++){
+
+        float2 posf = float2((float)id.x + norm.x*i+pixelBuffer[index].subPixPos.x ,(float)id.y + norm.y*i+pixelBuffer[index].subPixPos.y);
+        int2 pos = int2(floor(posf.x),floor(posf.y));
+        if((uint)pos.x >= TexSizeX || pos.x < 0 || (uint)pos.y >= TexSizeY || pos.y < 0){
+            pixelBuffer[index].particle = 2;
+            return target;
+        }
+        if((uint)pos.x == id.x && (uint)pos.y == id.y){
+            
+            continue;
+        }
+        
+        uint inTwo = indexFromCo(pos);
+        uint elTwo = pixelBuffer[inTwo].element; 
+        int rec = reactions[element][elTwo];
+        
+        if((uint)abs(floor(norm.x*i+pixelBuffer[index].subPixPos.x))>halfSize || (uint)abs(floor(norm.y*i+pixelBuffer[index].subPixPos.y))>halfSize){
+            pixelBuffer[index].subPixPos.y = targetf.y - target.y;
+        pixelBuffer[index].subPixPos.x = targetf.x - target.x;    
+            return target;
+
+        }
+        if(rec == -2 ){
+            
+            target = pos;
+            targetf = posf;
+        }
+        else if(rec >=0){
+            pixelBuffer[index].subPixPos.y = posf.y - pos.y;
+            pixelBuffer[index].subPixPos.x = posf.x - pos.x;
+            return pos;
+        }
+        else{
+            
+            if(pixelBuffer[inTwo].particle == 0){
+                
+                pixelBuffer[index].particle = 2;
+            }
+            pixelBuffer[index].subPixPos.y = targetf.y - target.y;
+            pixelBuffer[index].subPixPos.x = targetf.x - target.x;    
+            return target;
+        }
+    }
+    
+    float2 posf = float2((float)id.x + velo.x+pixelBuffer[index].subPixPos.x ,(float)id.y + velo.y+pixelBuffer[index].subPixPos.y);
+    int2 pos = int2(floor(posf.x),floor(posf.y));
+    uint inTwo = indexFromCo(pos);
+    uint elTwo = pixelBuffer[inTwo].element; 
+    int rec = reactions[element][elTwo];
+    if((uint)pos.x >= TexSizeX || pos.x < 0 || (uint)pos.y >= TexSizeY || pos.y < 0){
+        pixelBuffer[index].particle = 2;
+        return target;
+    }
+    if((uint)abs((int)(velo.x))>halfSize || (uint)abs((int)velo.y)>halfSize){
+        pixelBuffer[index].subPixPos.y = targetf.y - target.y;
+        pixelBuffer[index].subPixPos.x = targetf.x - target.x;    
+        return target;
+    }
+    
+    
+    if(rec != -1){
+        pixelBuffer[index].subPixPos.y = posf.y - pos.y;
+        pixelBuffer[index].subPixPos.x = posf.x - pos.x;
+        return pos;
+    }
+    else{
+        pixelBuffer[index].subPixPos.y = targetf.y - target.y;
+        pixelBuffer[index].subPixPos.x = targetf.x - target.x;    
+        if(pixelBuffer[inTwo].particle == 0){
+            
+            pixelBuffer[index].particle = 2;
+        }
+        return target;
+    }
+    
+
+}
+
+
+bool doTest(uint2 id, int ox, int oy, int i){
+    int2 pos = int2((int)id.x+ox,(int)id.y+oy);
+    if((uint)pos.x >= TexSizeX || pos.x < 0 || (uint)pos.y >= TexSizeY || pos.y < 0){
+        return false;
+    }
+    uint elOne = eleFromCo(id.xy);
+    uint elTwo = eleFromCo(pos);
+    int rec = reactions[elOne][elTwo];
+    int dens = density[elOne]-density[elTwo];
+    return (dens>0 && fluid_(elTwo)==1 && pixelBuffer[indexFromCo(pos)].movable == 0 && (i== 0 || dens > 10)) || (rec != -1);
+    //return eleFromCo(int2(id.x+ox,id.y+oy))<=0;
+        
+}
+uint getRelativeIndex(int2 dir){
+    int halfSize = (testAreaSize-1)/2;
+    int2 cor = int2(-(dir.x-halfSize),dir.y+halfSize);
+    return  cor.y*testAreaSize+cor.x;
+}
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    if(id.x >= TexSizeX || id.y >= TexSizeY){
+        return;
+    }
+    uint index = indexFromCo(id.xy);
+    uint element = eleFromCo(id.xy);
+    //Result[id.xy] = colors[int2(element,0)];
+    //Result[id.xy] = float4((float)element/4, 1-(float)element/4, (float)element/4, 1);
+    // if(element == 0)
+    //         Result[id.xy] = float4(0,0,1,1);
+    // if(element==4){
+    //     Result[id.xy] = float4(1,1,1,0.5);
+    // }
+    if(rerun && pixelBuffer[index].movable== 1){
+        return;
+    }
+    else{
+        pixelBuffer[index].movable= 0;
+    }
+    if(element <=0 ){
+        return;
+    }
+
+    
+    if(pixelBuffer[index].particle!= 0){
+        // if(pixelBuffer[index].particle == 3){
+        //     calcParticleTimer(id.xy);
+        // }
+        pixelBuffer[index].particle = 1;
+        if(!rerun){
+            pixelBuffer[index].velocity += float2(0,-9.81*dt*gravity[element]);
+        }
+        for(int i = 0; i<5; i++){
+            float2 veli = rotateVector(pixelBuffer[index].velocity, particleTests[i]);
+             uint2 target = particleTest(id.xy, veli,element);
+            if(target.x== id.x   && target.y == id.y && pixelBuffer[index].particle != 2){
+                continue;
+            }
+            else{
+                uint targetIndex= indexFromCo(target);
+                int2 dir = target-id.xy;
+                uint tI = getRelativeIndex(dir);
+
+                testArea[targetIndex*8] = tI+1;
+                return;
+            }
+        
+        }
+       
+    }
+
+   if( fluid_(eleFromCo(id.xy)) == 1){
+       
+        for(uint i = 0; i<8; i++){
+            uint x = flow_(element,i,0) * (flow_(element,i,2)==1? (id.x%2==0?1:-1):1);
+            uint y = flow_(element,i,1);
+            if(x==0 && y== 0){
+                
+                return;
+            }
+            if(doTest(id.xy,x,y,i)){
+                
+                uint2 target = uint2(id.x+x,id.y+y);
+                uint targetIndex= indexFromCo(target);
+                //Result[int2(id.x+x,id.y+y)] = float4(0,0,0,1);
+                uint tI =getRelativeIndex(int2(x,y));
+                
+               
+                testArea[targetIndex*8+i] = tI+1;
+                // if(i == 0){
+                //     Result[target]= float4(0,1,0,1);
+                // }
+                return;
+            }
+            //Result[id.xy] = float4(0,0,0,1);
+        }
+    }
+    //VectorGrid[indexFromCo(id.xy)] = int3(0,0,8);
+        // if(!doTest(id.xy,0,-1)){
+        //     if(!doTest(id.xy,id.x%2==0? 1:-1,-1)){
+        //         if(!doTest(id.xy,id.x%2==0? -1:1,-1)){
+        //             if(!doTest(id.xy,id.x%2==0? -1:1,0)){
+        //                 if(!doTest(id.xy,id.x%2==0? 1:-1,0)){
+        //                     //Result[id.xy] = Result[id.xy];
+        //                 }
+        //             }
+                    
+        //         }
+        //     }
+            
+            
+        // }
+        
+        
+}
+bool test(uint index, uint relIn, uint curIn, uint2 id){
+    for(int i = 0; i< 8; i++){
+        
+        
+        if(testArea[index*8+i] != 0){
+            
+            if(testArea[index*8+i] == relIn+1){
+                int dens = density[pixelBuffer[index].element]-density[pixelBuffer[curIn].element];
+                if(pixelBuffer[index].particle ==2){
+                    return true;
+                }
+                else if(dens>0){
+                    
+                    return true;
+                }
+                else if(dens <0){
+                    return false;
+                }
+                else{
+                    if(index>curIn){
+                        return true;
+                    }
+                }
+            }
+            
+            return false;
+        }
+    }
+    return true;
+}
+
+    //Result[id.xy] = float4(0,0,0,0);
+   // Result[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
+[numthreads(8,8,1)]
+void moveStuff (uint3 id : SV_DispatchThreadID)
+{
+    if(id.x >= TexSizeX || id.y >= TexSizeY){
+        return;
+    }
+    uint index = indexFromCo(id.xy);
+    //int3 Vector = VectorGrid[index];
+    // else{
+    //     Result[id.xy] = float4(0,0,0,1);
+    //     return;
+    // }
+    
+    int2 theOne = int2(-1,10);
+    for(int i = 0; i< 8; i++){
+        
+        
+        if(testArea[index*8+i] != 0){
+            theOne= int2(testArea[index*8+i]-1,i);
+            break;
+        }
+    }
+    if(theOne.y >= 9){
+        //Result[id.xy] = float4(1,1,1,1);
+        return;
+    }
+    // if(theOne.x == -1){
+    //     Result[id.xy] = float4(1,0,1,1);
+    // }
+    
+    //return;
+    // if(theOne.y == 0){
+    //     Result[id.xy] = float4(1,0,1,1);
+    // }
+    
+    int halfSize = (testAreaSize-1)/2;
+    int2 relCords = int2(theOne.x%testAreaSize,theOne.x/testAreaSize);
+    relCords = int2(relCords.x-halfSize,-(relCords.y-halfSize));
+    uint2 cords = id.xy+relCords;
+    
+    uint otherIndex = indexFromCo(cords);
+    
+    if(!test(otherIndex,getRelativeIndex(cords-id.xy),index,id.xy)){
+        return;
+        
+    }
+    
+    
+    uint el = pixelBuffer[index].element;
+    float2 vel = pixelBuffer[index].velocity;
+    pixel temp = pixelBuffer[index];
+    if(reactions[pixelBuffer[otherIndex].element][el] >= 0){
+       
+        uint elem = reactions[pixelBuffer[otherIndex].element][el];
+        pixelBuffer[index] = pixelBuffer[otherIndex];
+        pixelBuffer[index].element = elem;
+        resetPixel(otherIndex);
+        Result[id.xy] = colors[uint2(elem, 0)];
+        
+        Result[cords] = float4(0,0,0,0);
+        // if(elem==0){
+        //     Result[id.xy] = float4(1,1,0,1);
+        // }
+        pixelBuffer[index].movable= 1;
+        if(pixelBuffer[index].particle == 2){
+            
+            pixelBuffer[index].particle =0;
+            pixelBuffer[index].velocity = float2(0,0);
+        }
+        // else if(pixelBuffer[index].particle == 1 && index != otherIndex && length(int2(pixelBuffer[index].velocity.x*dt*pixelsPerUnit,pixelBuffer[index].velocity.y*dt*pixelsPerUnit))<1){
+        //     float velo = length(pixelBuffer[index].velocity);
+        //     pixelBuffer[index].particleTimer =  1/(velo*dt*pixelsPerUnit);
+            
+        
+        // }
+        
+            
+        return;
+
+    }
+    //Result[id.xy] = float4(1,1,1,1);
+
+    pixelBuffer[index] = pixelBuffer[otherIndex];
+    pixelBuffer[otherIndex] = temp;
+    float4 col = Result[id.xy];
+    Result[id.xy] = Result[cords];
+    Result[cords] = col;
+    pixelBuffer[index].movable= 1;
+    // if(length(velocity[index])==1){
+    //     Result[id.xy] = float4(1,1,1,1);
+    // }
+    if(pixelBuffer[otherIndex].element != 0){
+        pixelBuffer[otherIndex].movable = 1;
+       
+    }
+    if(pixelBuffer[index].particle == 2){
+        
+        pixelBuffer[index].particle =0;
+        pixelBuffer[index].velocity = float2(0,0);
+        // pixelBuffer[index].particleTimer = 0;
+    }
+    // else if(pixelBuffer[index].particle == 1 && index != otherIndex && length(int2(pixelBuffer[index].velocity.x*dt*pixelsPerUnit,pixelBuffer[index].velocity.y*dt*pixelsPerUnit))<1){
+    //     float velo = length(pixelBuffer[index].velocity);
+    //     pixelBuffer[index].particleTimer =  1/(velo*dt*pixelsPerUnit);
+        
+    
+    // }
+    //testArea[index*8].y = 1;
+    
+
+
+    // for(int x = -1; x<2; x++){
+    //     for(int y = -1; y<2; y++){
+    //         int2 pos = target+int2(x,y);
+    //         int i = indexFromCo(pos);
+    //         if(i== index){
+    //             continue;
+    //         }
+    //         if((pos+VectorGrid[i]).x == target.x && (pos+VectorGrid[i]).y == target.y){
+    //             if(VectorGrid[i].z < Vector.z){
+    //             return;
+    //             }
+    //             else if(VectorGrid[i].z == Vector.z){
+    //                 if(i>index){
+    //                     return;
+    //                 }
+    //             }
+    //         }
+            
+    //     }
+    // }
+    // int targetIndex = indexFromCo(target);
+    // elements[targetIndex] = elements[index];
+    // Result[target] = Result[id.xy];
+    // elements[index] = 0;
+    // Result[id.xy] = float4(0,0,0,0);
+    // VectorGrid[targetIndex].z = 9; 
+}
+
+
+[numthreads(8,8,1)]
+void wipe (uint3 id : SV_DispatchThreadID){
+    if(id.x >= TexSizeX || id.y >= TexSizeY){
+        return;
+    }
+    for(int i  =0; i<8; i++){
+        testArea[indexFromCo(id.xy)*8+i] = 0;
+    }
+    
+}

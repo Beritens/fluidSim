@@ -1,0 +1,10 @@
+Base path: 'C:/Program Files/Unity/Hub/Editor/2019.3.0f3/Editor/Data', plugins path 'C:/Program Files/Unity/Hub/Editor/2019.3.0f3/Editor/Data/PlaybackEngines'
+Cmd: initializeCompiler
+Cmd: compileComputeKernel
+  api=4 insize=14614 outsize=601 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at fluidSim.compute(179): use of potentially uninitialized variable (doTest)
+  api=4 insize=14606 outsize=9448 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at fluidSim.compute(179): use of potentially uninitialized variable (doTest)
+  api=4 insize=14813 outsize=9524 ok=1

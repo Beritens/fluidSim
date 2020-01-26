@@ -1,0 +1,35 @@
+Base path: 'C:/Program Files/Unity/Hub/Editor/2019.3.0f3/Editor/Data', plugins path 'C:/Program Files/Unity/Hub/Editor/2019.3.0f3/Editor/Data/PlaybackEngines'
+Cmd: initializeCompiler
+Cmd: compileComputeKernel
+  api=4 insize=14370 outsize=601 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at fluidSim.compute(179): use of potentially uninitialized variable (doTest)
+  api=4 insize=14556 outsize=9450 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at fluidSim.compute(179): use of potentially uninitialized variable (doTest)
+  api=4 insize=14572 outsize=9450 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at fluidSim.compute(181): use of potentially uninitialized variable (doTest)
+  api=4 insize=14656 outsize=9552 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=14750 outsize=601 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at fluidSim.compute(98): signed/unsigned mismatch, unsigned assumed
+  error: 1 plat 4 at fluidSim.compute(103): signed/unsigned mismatch, unsigned assumed
+  error: 1 plat 4 at fluidSim.compute(145): signed/unsigned mismatch, unsigned assumed
+  api=4 insize=14654 outsize=601 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at fluidSim.compute(103): signed/unsigned mismatch, unsigned assumed
+  error: 1 plat 4 at fluidSim.compute(145): signed/unsigned mismatch, unsigned assumed
+  error: 1 plat 4 at fluidSim.compute(181): use of potentially uninitialized variable (doTest)
+  api=4 insize=14666 outsize=9772 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at fluidSim.compute(145): signed/unsigned mismatch, unsigned assumed
+  api=4 insize=14678 outsize=601 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=14690 outsize=601 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at fluidSim.compute(181): use of potentially uninitialized variable (doTest)
+  api=4 insize=14692 outsize=9552 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=14813 outsize=709 ok=1

@@ -1,0 +1,28 @@
+Base path: 'C:/Program Files/Unity/Hub/Editor/2019.3.0f3/Editor/Data', plugins path 'C:/Program Files/Unity/Hub/Editor/2019.3.0f3/Editor/Data/PlaybackEngines'
+Cmd: initializeCompiler
+Cmd: compileComputeKernel
+  error: 2 plat 4 at fluidSim.compute(197): syntax error: unexpected token 'if'
+  error: 2 plat 4 at fluidSim.compute(200): syntax error: unexpected token 'else'
+  api=4 insize=14369 outsize=0 ok=0
+Cmd: compileComputeKernel
+  error: 1 plat 4 at fluidSim.compute(178): use of potentially uninitialized variable (doTest)
+  api=4 insize=14546 outsize=9390 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at fluidSim.compute(179): use of potentially uninitialized variable (doTest)
+  api=4 insize=14574 outsize=9276 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=14669 outsize=601 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at fluidSim.compute(103): signed/unsigned mismatch, unsigned assumed
+  error: 1 plat 4 at fluidSim.compute(145): signed/unsigned mismatch, unsigned assumed
+  api=4 insize=14666 outsize=601 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at fluidSim.compute(145): signed/unsigned mismatch, unsigned assumed
+  error: 1 plat 4 at fluidSim.compute(181): use of potentially uninitialized variable (doTest)
+  api=4 insize=14678 outsize=9772 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at fluidSim.compute(181): use of potentially uninitialized variable (doTest)
+  api=4 insize=14688 outsize=9784 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at fluidSim.compute(179): use of potentially uninitialized variable (doTest)
+  api=4 insize=14819 outsize=9524 ok=1

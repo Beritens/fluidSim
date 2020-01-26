@@ -1,0 +1,96 @@
+Base path: 'C:/Program Files/Unity/Hub/Editor/2019.3.0f3/Editor/Data', plugins path 'C:/Program Files/Unity/Hub/Editor/2019.3.0f3/Editor/Data/PlaybackEngines'
+Cmd: initializeCompiler
+Cmd: preprocessCompute
+  insize=14366 outsize=14369 ok=1
+Cmd: compileComputeKernel
+  error: 2 plat 4 at fluidSim.compute(197): syntax error: unexpected token 'if'
+  error: 2 plat 4 at fluidSim.compute(200): syntax error: unexpected token 'else'
+  api=4 insize=14369 outsize=0 ok=0
+Cmd: preprocessCompute
+  insize=14367 outsize=14370 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=14370 outsize=4417 ok=1
+Cmd: preprocessCompute
+  insize=14543 outsize=14546 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=14546 outsize=4417 ok=1
+Cmd: preprocessCompute
+  insize=14553 outsize=14556 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=14556 outsize=4417 ok=1
+Cmd: preprocessCompute
+  insize=14591 outsize=14594 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=14594 outsize=4433 ok=1
+Cmd: preprocessCompute
+  insize=14611 outsize=14614 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=14614 outsize=4453 ok=1
+Cmd: preprocessCompute
+  insize=14569 outsize=14572 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=14572 outsize=4417 ok=1
+Cmd: preprocessCompute
+  insize=14571 outsize=14574 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=14574 outsize=4417 ok=1
+Cmd: preprocessCompute
+  insize=14653 outsize=14656 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=14656 outsize=4417 ok=1
+Cmd: preprocessCompute
+  insize=14666 outsize=14669 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=14669 outsize=223 ok=1
+Cmd: preprocessCompute
+  insize=14747 outsize=14750 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=14750 outsize=4417 ok=1
+Cmd: preprocessCompute
+  insize=14651 outsize=14654 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at fluidSim.compute(98): signed/unsigned mismatch, unsigned assumed
+  error: 1 plat 4 at fluidSim.compute(103): signed/unsigned mismatch, unsigned assumed
+  error: 1 plat 4 at fluidSim.compute(145): signed/unsigned mismatch, unsigned assumed
+  api=4 insize=14654 outsize=4417 ok=1
+Cmd: preprocessCompute
+  insize=14663 outsize=14666 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at fluidSim.compute(103): signed/unsigned mismatch, unsigned assumed
+  error: 1 plat 4 at fluidSim.compute(145): signed/unsigned mismatch, unsigned assumed
+  api=4 insize=14666 outsize=4417 ok=1
+Cmd: preprocessCompute
+  insize=14675 outsize=14678 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at fluidSim.compute(145): signed/unsigned mismatch, unsigned assumed
+  api=4 insize=14678 outsize=4417 ok=1
+Cmd: preprocessCompute
+  insize=14687 outsize=14690 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=14690 outsize=4417 ok=1
+Cmd: preprocessCompute
+  insize=14685 outsize=14688 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=14688 outsize=4417 ok=1
+Cmd: preprocessCompute
+  insize=14689 outsize=14692 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=14692 outsize=4417 ok=1
+Cmd: preprocessCompute
+  insize=14603 outsize=14606 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=14606 outsize=4417 ok=1
+Cmd: preprocessCompute
+  insize=14810 outsize=14813 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=14813 outsize=4525 ok=1
+Cmd: preprocessCompute
+  insize=14816 outsize=14819 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=14819 outsize=4525 ok=1
+Cmd: preprocessCompute
+  insize=14777 outsize=14780 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=14780 outsize=9434 ok=1
+
+Quitting shader compiler process

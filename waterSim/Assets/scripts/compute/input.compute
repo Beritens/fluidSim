@@ -1,0 +1,46 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+uint posX;
+uint posY;
+uint brushSize;
+uint element;
+uint TexSizeX;
+uint TexSizeY;
+RWTexture2D<float4> Result;
+Texture2D<float4> brush;
+Texture2D<float4> colors;
+struct pixel{
+        
+        uint element;
+        uint movable;
+        float2 velocity;
+        uint particle;
+        float2 subPixPos;
+};
+RWStructuredBuffer<pixel> pixelBuffer;
+
+int indexFromCo(int2 co){
+    return co.y*TexSizeX +co.x;
+}
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    // TODO: insert actual code here!
+    if(brush[id.xy].a >0 ){
+        uint2 pos = uint2(posX,posY);
+        uint2 bS = int2((brushSize-1)/2,(brushSize-1)/2);
+        uint2 posi = pos+id.xy-bS;
+        if(posi.x>=TexSizeX|| posi.y>= TexSizeY || posi.x<0 || posi.y <0)
+            return;
+        uint index = indexFromCo(posi);
+        pixelBuffer[index].element= element;
+        pixelBuffer[index].velocity =float2(((float)id.x -(float)bS.x) *0.1,((float)id.y -(float)bS.y) *0.1);
+        pixelBuffer[index].particle = 1;
+        Result[posi] = colors[int2(element,0)];
+    }
+    
+}
